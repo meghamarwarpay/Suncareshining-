@@ -29,15 +29,15 @@ export default function InvoiceTemplate({ order }) {
             <div className="row">
               <div style={{ textAlign: 'center', marginBottom: '15px' }}>
                 <h3 className="text-2xl font-bold text-black-800">
-                  PinkCIty Infotech Solution Pvt Ltd.
+                Suncareshining solution private limited
                 </h3>
                 <h4 className="text-lg text-gray-600 mt-1">Receipt / Tax Invoice</h4>
               </div>
               <div className="col-6 text-sm text-black-500 mt-2">
-                <p><strong>GST</strong>: 08AAOCP4750B1ZE</p>
-                <p><strong>Address</strong>: Alpine tower, 101, 1st floor, 9 Dukan, Kalwar road, Jaipur, Rajasthan</p>
-                <p><strong>Email</strong>: Pinkcityinfotek@gmail.com</p>
-                <p><strong>Contact</strong>: +91-9351888150</p>
+                <p><strong>GST</strong>: 08ABMCS6086P1Z8</p>
+                <p><strong>Address</strong>: Plot No. -24, Dinesh Rd Ajmer Rd, Madrampura, Pincode-302006, Jaipur, Rajasthan</p>
+                <p><strong>Email</strong>:Suncareshiningsolution@gmail.com</p>
+                <p><strong>Contact</strong>: +91-8306420304</p>
               </div>
               <div className="col-6 text-right">
                 <p className="text-sm text-black-500"><strong>INV No</strong>: {invoiceNo}</p>
@@ -106,9 +106,9 @@ export default function InvoiceTemplate({ order }) {
             PAYMENT TERMS: IMMEDIATE
           </div>
           <div className="text-center text-xs text-black-500">
-            <h5 className="mb-2"><strong>PinkCIty Infotech Solution Pvt Ltd.</strong></h5>
-            <p>Alpine tower,101,1st floor, 9 Dukan, Kalwar road, Jaipur,Rajasthan</p>
-            <p>CIN: U47410RJ2024PTC095632 | <a href="https://pinkcitycart.com/" className="text-blue-600 underline">https://pinkcitycart.com/</a></p>
+            <h5 className="mb-2"><strong>Suncareshining solution private limited</strong></h5>
+            <p>Plot No. -24, Dinesh Rd Ajmer Rd, Madrampura, Pincode-302006, Jaipur, Rajasthan</p>
+            <p>CIN: U47410RJ2024PTC095632 | <a href="https://suncareshining.com/" className="text-blue-600 underline">https://suncareshining.com/</a></p>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import Header from "@/Layout/Header";
 import { apiPost } from "@/api/apiMethods";
 
@@ -19,7 +19,7 @@ const CheckoutForm = () => {
  
   });
 
-  const router = useRouter();
+  // const router = useRouter();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -48,7 +48,8 @@ const CheckoutForm = () => {
       await axios.post(postReqURL, postData);
 
       // Optionally, redirect the user to the payment page after successful submission
-      router.push("/payment");
+      // router.push("/payment");
+      window.location.href = "/payment";
     } catch (error) {
       console.error("Error submitting order", error);
     }

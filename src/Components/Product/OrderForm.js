@@ -1,6 +1,8 @@
-'use client';
+
+
+"use client";
 import { useState, useEffect } from "react";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import axios from "axios";
 import { apiPost } from "@/api/apiMethods";
@@ -8,7 +10,7 @@ import Header from "@/Layout/Header";
 import { useCart } from "@/context/CartContext"; // Import useCart hook
 
 const OrderForm = () => {
-  // const router = useRouter();
+  const router = useRouter();
   const { buyNowProduct } = useCart(); // Access buyNowProduct from context
   const [formData, setFormData] = useState({
     firstName: "",
@@ -22,47 +24,48 @@ const OrderForm = () => {
     productName: buyNowProduct?.productName || "",
     productId: buyNowProduct?._id || "",
     productImages: buyNowProduct?.images?.[0] || "",
-    productprice: buyNowProduct?.actualPrice || ""
+    productprice: buyNowProduct?.actualPrice || "",
   });
 
   const [loading, setLoading] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
 
-  if (!buyNowProduct) {
-    // router.push("/"); // Redirect if no product is selected for Buy Now
-  }
+  useEffect(() => {
+    // Redirect to home if no product is available
+    if (!buyNowProduct) {
+      router.push("/");
+    }
+  }, [buyNowProduct, router]);
 
-  // Verify the actualPrice and qty values here
-  const totalAmountNum = buyNowProduct ? buyNowProduct.actualPrice * buyNowProduct.qty : 0;
-  console.log("Price: ", buyNowProduct?.actualPrice, "Quantity: ", buyNowProduct?.qty, "Total Amount: ", totalAmountNum); // Log to verify calculation
+  const totalAmountNum = buyNowProduct
+    ? buyNowProduct.actualPrice * buyNowProduct.qty
+    : 0;
 
   const txnid = `tgD59N${Date.now()}`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate form data
     if (!formData.firstName || !formData.lastName || !formData.mobile) {
       alert("Please fill out all required fields.");
       return;
     }
 
-    setLoading(true); // Set loading to true while the request is being made
+    setLoading(true);
 
-    // Prepare order data
     const orderData = {
       products: [
         {
-          product: buyNowProduct?._id, // Use product ID from buyNowProduct
+          product: buyNowProduct?._id,
           quantity: String(buyNowProduct.qty),
           productName: buyNowProduct?.productName,
-          price: buyNowProduct.actualPrice, // Ensure correct price is used
+          price: buyNowProduct.actualPrice,
           category: buyNowProduct?.category,
           description: buyNowProduct?.description,
           images: buyNowProduct?.images,
         },
       ],
-      totalAmount: String(totalAmountNum), // Use totalAmountNum here
+      totalAmount: String(totalAmountNum),
       shippingAddress: JSON.stringify({
         name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
@@ -75,19 +78,19 @@ const OrderForm = () => {
         prductid: formData.productId,
         productName: formData.productName,
         description: formData.description,
-        price : formData.productprice,
+        price: formData.productprice,
       }),
-      paymentMethod: "paypal", // Assuming PayPal for now
+      paymentMethod: "paypal",
     };
 
     try {
-      // Place the order
       const orderResponse = await apiPost("api/order3/orders3", orderData);
 
-      let postReqURl = "https://payment.yunicare.in/payment/ImpactStoreGeneratePayment";
+      let postReqURl =
+        "https://payment.yunicare.in/payment/ImpactStoreGeneratePayment";
       let postData = {
         trxId: txnid,
-        amount: String(totalAmountNum), // Correct totalAmountNum passed here
+        amount: String(totalAmountNum),
         redirectUrl: "http://impactstore.in/cart",
       };
 
@@ -97,15 +100,14 @@ const OrderForm = () => {
     } catch (err) {
       console.error("Order or payment request failed:", err);
       alert("Error occurred while placing the order.");
-      // router.push("/login")
       setLoading(false);
+      router.push("/login"); // Redirect on error
     }
   };
 
-  // Redirect to payment URL when it's set
   useEffect(() => {
     if (paymentUrl) {
-      window.open(paymentUrl, "_blank"); // Open the payment URL in a new tab
+      window.open(paymentUrl, "_blank");
     }
   }, [paymentUrl]);
 
@@ -116,23 +118,31 @@ const OrderForm = () => {
         <div style={{ marginTop: "15%" }}>
           <h2>Order Form</h2>
           <Row>
-            {/* Product Details */}
             <Col md={8}>
-              <img
-                src={buyNowProduct?.images[0]}
-                alt={buyNowProduct?.productName}
-                style={{ width: "100px", height: "100px", objectFit: "cover" }}
-              />
-              <h4>{buyNowProduct?._id}</h4>
-              <h4>{buyNowProduct?.productName}</h4>
-              <p>{buyNowProduct?.description}</p>
+              {buyNowProduct && (
+                <>
+                  <img
+                    src={buyNowProduct?.images[0]}
+                    alt={buyNowProduct?.productName}
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <h4>{buyNowProduct?._id}</h4>
+                  <h4>{buyNowProduct?.productName}</h4>
+                  <p>{buyNowProduct?.description}</p>
+                </>
+              )}
             </Col>
 
-            {/* Order Summary */}
             <Col md={4}>
-              <h4 className="text-success">Price: ₹{buyNowProduct?.actualPrice}</h4>
+              <h4 className="text-success">
+                Price: ₹{buyNowProduct?.actualPrice}
+              </h4>
               <h4>Quantity: {buyNowProduct?.qty}</h4>
-              <h4>Total: ₹{totalAmountNum}</h4> {/* Ensure the correct total amount is displayed */}
+              <h4>Total: ₹{totalAmountNum}</h4>
             </Col>
           </Row>
           <Col>
@@ -260,5 +270,3 @@ const OrderForm = () => {
 };
 
 export default OrderForm;
-
-

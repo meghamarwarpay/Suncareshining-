@@ -1,36 +1,37 @@
+
 'use client';
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import { apiGet } from "@/api/apiMethods";
 
 const AllProduct = () => {
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(8);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch(
-          "https://ajay.yunicare.in/api/product3/getproducts3"
-        );
-        const data = await res.json();
-        setProducts(data.products);
-      } catch (error) {
-        console.error("Error fetching products:", error);
+        const response = await apiGet("api/product3/getproducts3");
+        console.log(response.data); // Log response to verify data
+        setProducts(response.data.products || response.data); // Ensure products exist in the response
+      } catch (err) {
+        setError(err.message); // Handle error
+      } finally {
+        setLoading(false); // Stop loading indicator
       }
     };
 
     fetchProducts();
-  }, []);
+  }, []); // Empty dependency, run once
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
+  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
 
   const nextPage = () =>
     setCurrentPage((prev) => (prev < Math.ceil(products.length / productsPerPage) ? prev + 1 : prev));
@@ -40,15 +41,29 @@ const AllProduct = () => {
     router.push(`/product/${id}`);
   };
 
+  // Error and loading handling
+  // if (loading) {
+  //   return <div>Loading...</div>;
+  // }
+
+  // if (error) {
+  //   return <div>Error: {error}</div>;
+  // }
+
+  // If no products
+  // if (products.length === 0) {
+  //   return <div>No products available.</div>;
+  // }
+
   return (
     <Container className="mt-4">
       <Row>
         {currentProducts.map((product) => (
           <Col md={3} key={product._id} className="mb-4">
-            <Card className="h-100 shadow-sm" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',}}>
+            <Card className="h-100 shadow-sm" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', }}>
               <Card.Img
                 variant="top"
-                src={product.images[0]}
+                src={product.images[0] || "/placeholder.jpg"} // Fallback for image
                 alt={product.productName}
                 style={{ objectFit: "cover", height: "200px" }}
               />
@@ -61,7 +76,6 @@ const AllProduct = () => {
                   <span style={{ color: "#ffc107" }}>★★★★☆</span>
                 </div>
                 <Button
-                  // variant="primary"
                   className="mt-auto btnprimary"
                   onClick={() => handleViewDetails(product._id)}
                 >

@@ -130,11 +130,15 @@ const OrderHistory = () => {
             document.body.removeChild(link);
           };
         
-          const handleInvoiceClick = (orderId) => {
-                window.open(`/invoice/${orderId}`, "_blank");
-              };
+          // const handleInvoiceClick = (orderId) => {
+          //       window.open(`/invoice/${orderId}`, "_blank");
+          //     };
  
-    
+          const handleInvoiceClick = (orderId) => {
+            // Navigate to the Invoice Page with the orderId in the URL
+            router.push(`/invoice/${orderId}`);
+          };
+          
 
   return (
     <>
@@ -142,7 +146,7 @@ const OrderHistory = () => {
       <div
         style={{
           position: "fixed",
-          top: "135px",
+          top: "140px",
           width: "100%",
           zIndex: "1",
           backgroundColor: "#fff",
@@ -226,11 +230,15 @@ const OrderHistory = () => {
                         )}
                       </Col>
                       <Col md={8}>
+                      <p> <strong>Product </strong> {shippingAddress.productName}</p>
                         <p>
                           <strong>Total Amount:</strong> ₹{order.totalAmount}
                         </p>
                         <p>
-                          <strong>Customer:</strong> {order.customer.email}
+                          {/* <strong>Customer:</strong> {order.userDetail.email} */}
+                        </p>
+                        <p>
+                          <strong>Customer:</strong> {shippingAddress.email}
                         </p>
                         <p>
                           <strong>Customer Name:</strong> {shippingAddress.name}

@@ -1,3 +1,4 @@
+'use client';
 import { useCart } from "@/context/CartContext";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useRouter } from "next/navigation";

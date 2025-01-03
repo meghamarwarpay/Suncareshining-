@@ -1,63 +1,38 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Container, Row, Col } from "react-bootstrap";
-import { ToastContainer } from "react-toastify";
-import Header from "@/Layout/Header";
-import { useCart } from "@/context/CartContext";
-import "react-toastify/dist/ReactToastify.css";
-import { toast } from "react-toastify";
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import axios from 'axios'; // Import axios
+import Header from '@/Layout/Header';
+import { Col, Container, Row, Spinner } from 'react-bootstrap';
+import { toast, ToastContainer } from 'react-toastify';
+import { useCart } from '@/context/CartContext';
+import { apiGet } from '@/api/apiMethods';
 
-const ProductDetail = ({ id }) => {
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(""); // Default selected image is empty
-  const { addToCart, setBuyNow, addToWishlist } = useCart();
+const ProductDetail = () => {
   const router = useRouter();
-  // const { id } = router.query;
+  const { id } = router.query; // Get product ID from the URL
+  const [product, setProduct] = useState(null);
+  const [selectedImage, setSelectedImage] = useState("");
+  const { addToCart, setBuyNow, addToWishlist } = useCart();
 
   useEffect(() => {
-    if (!id) return; // Ensure `id` is available
-
-    const fetchProduct = async () => {
-      try {
-        const res = await fetch(
-          `https://ajay.yunicare.in/api/product3/getproduct3/${id}`
-        );
-        const data = await res.json();
-        if (res.ok) {
-          setProduct(data.product);
-          setSelectedImage(data.product.images[0]); // Set first image as selected by default
-        } else {
-          setError(data.message || "Error fetching product details");
-        }
-      } catch (err) {
-        setError("Failed to fetch product details");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProduct();
+    if (id) {
+      // Fetch product details using axios
+      apiGet(`api/product3/getproduct3/${id}`)
+        .then((response) => {
+          if (response.data.product) {
+            setProduct(response.data.product);
+          } else {
+            toast.error("Product not found");
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching product:', error);
+          toast.error("Error fetching product details");
+        });
+    }
   }, [id]);
-
-  if (loading) {
-    return (
-      <Container className="mt-4">
-        <p>Loading product details...</p>
-      </Container>
-    );
-  }
-
-  if (error) {
-    return (
-      <Container className="mt-4">
-        <p className="text-danger">{error}</p>
-      </Container>
-    );
-  }
 
   const handleAddToCart = () => {
     const token = localStorage.getItem("accessToken");
@@ -93,65 +68,73 @@ const ProductDetail = ({ id }) => {
   };
 
   return (
-    <>
+    <div>
       <Header />
       <Container className="mt-5">
-        <Row style={{ marginTop: "13%" }}>
-          {/* Left Section */}
-          <Col md={6}>
-            <img
-              src={selectedImage}
-              className=" mb-3"
-              style={{ width: "70%", }}
-            />
-            <div className="d-flex gap-2">
-              {product.images.map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  style={{
-                    width: "70px",
-                    height: "70px",
-                    objectFit: "cover",
-                    cursor: "pointer",
-                    border: selectedImage === img ? "2px solid blue" : "none",
-                  }}
-                  onClick={() => setSelectedImage(img)}
-                />
-              ))}
-            </div>
-          </Col>
+        {!product ? (
+          <div className="text-center" style={{ marginTop: "13%" }}>
+            <Spinner animation="border" role="status" className="mb-3" />
+            <p>Loading product details...</p>
+          </div>
+        ) : (
+          <Row style={{ marginTop: "13%" }}>
+            {/* Left Section */}
+            <Col md={6}>
+              <img
+                src={selectedImage || product.images[0]}
+                className="mb-3"
+                style={{ width: "70%", cursor: "pointer" }}
+              />
+              <div className="d-flex gap-2">
+                {product.images.map((img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    style={{
+                      width: "70px",
+                      height: "70px",
+                      objectFit: "cover",
+                      cursor: "pointer",
+                      border: selectedImage === img ? "2px solid blue" : "none",
+                    }}
+                    onClick={() => setSelectedImage(img)}
+                    alt={`thumbnail-${index}`}
+                  />
+                ))}
+              </div>
+            </Col>
 
-          {/* Right Section */}
-          <Col md={6}>
-            <h2>{product.productName}</h2>
-            <p>{product.description}</p>
-            <h4 className="text-success">Price: ₹{product.actualPrice}</h4>
-            <p className="text-muted">
-              MRP: <span className="text-decoration-line-through">₹{product.price}</span>
-            </p>
-            <Row>
-              <Col>
-                <button className="btn btn-primary" onClick={handleAddToCart}>
-                  Add to Cart
-                </button>
-              </Col>
-              <Col>
-                <button className="btn btn-success" onClick={handleBuyNow}>
-                  Buy Now
-                </button>
-              </Col>
-              <Col>
-                <button className="btn btn-warning" onClick={handleAddToWishlist}>
-                  Add to Wishlist
-                </button>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
+            {/* Right Section */}
+            <Col md={6}>
+              <h2>{product.productName}</h2>
+              <p>{product.description}</p>
+              <h4 className="text-success">Price: ₹{product.actualPrice}</h4>
+              <p className="text-muted">
+                MRP: <span className="text-decoration-line-through">₹{product.price}</span>
+              </p>
+              <Row>
+                <Col>
+                  <button className="btn btn-primary" onClick={handleAddToCart}>
+                    Add to Cart
+                  </button>
+                </Col>
+                <Col>
+                  <button className="btn btn-success" onClick={handleBuyNow}>
+                    Buy Now
+                  </button>
+                </Col>
+                <Col>
+                  <button className="btn btn-warning" onClick={handleAddToWishlist}>
+                    Add to Wishlist
+                  </button>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        )}
       </Container>
       <ToastContainer position="top-right" autoClose={2000} />
-    </>
+    </div>
   );
 };
 
